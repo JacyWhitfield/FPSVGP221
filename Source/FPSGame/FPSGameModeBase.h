@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright Epic Games, Inc. All Rights Reserved.
 
 #pragma once
 
@@ -6,13 +6,11 @@
 #include "GameFramework/GameModeBase.h"
 #include "FPSGameModeBase.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class FPSGAME_API AFPSGameModeBase : public AGameModeBase
 {
-	GENERATED_BODY()
-	
-	virtual void StartPlay() override;
+    GENERATED_BODY()
+
+public:
+    virtual void StartPlay() override;
 };
