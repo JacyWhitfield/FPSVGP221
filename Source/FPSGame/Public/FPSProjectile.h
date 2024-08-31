@@ -11,40 +11,35 @@
 UCLASS()
 class FPSGAME_API AFPSProjectile : public AActor
 {
-	GENERATED_BODY()
-	
-public:	
-	// Sets default values for this actor's properties
-	AFPSProjectile();
+    GENERATED_BODY()
+
+public:
+    AFPSProjectile();
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+    virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+public:
+    virtual void Tick(float DeltaTime) override;
 
+    UPROPERTY(EditAnywhere, Category = "Movement")
+    float BulletSpeed = 1000;
 
-	UPROPERTY(EditAnywhere, Category ="Movement")
-	float BulletSpeed = 1000;
-	
-	UPROPERTY(VisibleDefaultsOnly, Category = "Projectile")
-	USphereComponent* CollisionComponent;
+    UPROPERTY(VisibleDefaultsOnly, Category = "Projectile")
+    USphereComponent* CollisionComponent;
 
-	UPROPERTY(VisibleAnywhere, Category = "Movement")
-	UProjectileMovementComponent* ProjectileMovementComponent;
+    UPROPERTY(VisibleAnywhere, Category = "Movement")
+    UProjectileMovementComponent* ProjectileMovementComponent;
 
-	UPROPERTY(VisibleDefaultsOnly, Category = "Projectile")
-	UStaticMeshComponent* ProjectileMeshComponent;
+    UPROPERTY(VisibleDefaultsOnly, Category = "Projectile")
+    UStaticMeshComponent* ProjectileMeshComponent;
 
-	UPROPERTY(VisibleDefaultsOnly, Category = "Projectile")
-	UMaterialInstanceDynamic* ProjectileMaterialInstance;
-	
-	UFUNCTION()
-	void FireInDirection(const FVector& ShootDirection);
+    UPROPERTY(VisibleDefaultsOnly, Category = "Projectile")
+    UMaterialInstanceDynamic* ProjectileMaterialInstance;
 
-	UFUNCTION()
-	void OnWhateverYouWantToNameIt(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
+    UFUNCTION()
+    void FireInDirection(const FVector& ShootDirection);
 
+    UFUNCTION()
+    void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
 };
