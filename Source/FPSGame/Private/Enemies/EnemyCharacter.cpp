@@ -1,4 +1,5 @@
 #include "Enemies/EnemyCharacter.h"
+#include "Player/FPSCharacter.h"
 #include "Kismet/GameplayStatics.h"
 #include "TimerManager.h"
 #include "AIController.h"
@@ -15,6 +16,7 @@ AEnemyCharacter::AEnemyCharacter()
 
     Health = 100.0f;
 
+    // Initialize perception components
     AIPerceptionComponent = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerceptionComponent"));
     SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("SightConfig"));
 
@@ -41,7 +43,16 @@ void AEnemyCharacter::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
 
-    DrawDebugSphere(GetWorld(), GetActorLocation(), ShootingRange, 32, FColor::Red, false, -1, 0, 2.0f);
+    ACharacter* PlayerCharacter = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+    if (PlayerCharacter)
+    {
+        // Calculate the direction to the player
+        FVector DirectionToPlayer = PlayerCharacter->GetActorLocation() - GetActorLocation();
+        DirectionToPlayer.Z = 0.0f; // Keep rotation flat on the ground plane
+
+        FRotator NewRotation = FRotationMatrix::MakeFromX(DirectionToPlayer).Rotator();
+        SetActorRotation(NewRotation);
+    }
 }
 
 float AEnemyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -58,13 +69,13 @@ void AEnemyCharacter::Shoot()
 {
     if (ProjectileClass && IsPlayerInRange())
     {
-        FVector MuzzleLocation = GetActorLocation() + FVector(0.0f, 0.0f, GetSimpleCollisionHalfHeight());
+        FVector MuzzleLocation = GetActorLocation() + FVector(100.0f, 0.0f, GetSimpleCollisionHalfHeight());
         FRotator MuzzleRotation = GetActorRotation();
 
         AFPSProjectile* Projectile = GetWorld()->SpawnActor<AFPSProjectile>(ProjectileClass, MuzzleLocation, MuzzleRotation);
         if (Projectile)
         {
-            UE_LOG(LogTemp, Warning, TEXT("Enemy is shooting at the player."));
+            Projectile->FireInDirection(MuzzleRotation.Vector());
         }
     }
 }
@@ -86,5 +97,14 @@ void AEnemyCharacter::OnTargetDetected(AActor* Actor, FAIStimulus Stimulus)
     {
         UE_LOG(LogTemp, Warning, TEXT("Player detected by enemy!"));
         Shoot();
+    }
+}
+
+void AEnemyCharacter::AddHealth(float HealthAmount)
+{
+    Health += HealthAmount;
+    if (Health <= 0.0f)
+    {
+        Destroy();
     }
 }

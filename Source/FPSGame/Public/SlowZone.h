@@ -3,8 +3,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Components/BoxComponent.h"
+#include "Components/StaticMeshComponent.h"
 #include "SlowZone.generated.h"
-
 
 UCLASS()
 class FPSGAME_API ASlowZone : public AActor
@@ -24,14 +24,14 @@ public:
     virtual void Tick(float DeltaTime) override;
 
 private:
-    UPROPERTY(VisibleAnywhere)
-
+    UPROPERTY(VisibleAnywhere, Category = "Components")
     UBoxComponent* BoxComponent;
 
-    UFUNCTION()
+    UPROPERTY(VisibleAnywhere, Category = "Components")
+    UStaticMeshComponent* StaticMeshComponent;
 
-    void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
-        int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+    UFUNCTION()
+    void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
     UFUNCTION()
     void OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);

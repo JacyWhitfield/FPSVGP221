@@ -1,27 +1,39 @@
 #include "SlowZone.h"
 #include "Components/BoxComponent.h"
+#include "Components/StaticMeshComponent.h"
 #include "Player/FPSCharacter.h"
 
-// Sets default values
 ASlowZone::ASlowZone()
 {
     PrimaryActorTick.bCanEverTick = true;
 
     BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxComponent"));
+    BoxComponent->SetBoxExtent(FVector(100.0f, 100.0f, 10.0f)); // Collider size
     RootComponent = BoxComponent;
 
-    BoxComponent->SetCollisionProfileName("Trigger");
+    // Setup Static Mesh
+    StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
+    StaticMeshComponent->SetupAttachment(RootComponent);
+    StaticMeshComponent->SetRelativeScale3D(FVector(1.0f, 1.0f, 0.1f)); // Flatten the mesh to look like a floor tile
+
+    // Use the basic cube mesh
+    StaticMeshComponent->SetStaticMesh(ConstructorHelpers::FObjectFinder<UStaticMesh>(TEXT("/Engine/BasicShapes/Cube.Cube")).Object);
+
+    // Use a default material
+    StaticMeshComponent->SetMaterial(0, ConstructorHelpers::FObjectFinder<UMaterial>(TEXT("/Engine/BasicShapes/BasicShapeMaterial.BasicShapeMaterial")).Object);
+
+    StaticMeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+    StaticMeshComponent->SetVisibility(true);
+
     BoxComponent->OnComponentBeginOverlap.AddDynamic(this, &ASlowZone::OnOverlapBegin);
     BoxComponent->OnComponentEndOverlap.AddDynamic(this, &ASlowZone::OnOverlapEnd);
 }
 
-// Called when the game starts or when spawned
 void ASlowZone::BeginPlay()
 {
     Super::BeginPlay();
 }
 
-// Called every frame
 void ASlowZone::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);

@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -23,7 +21,7 @@ public:
     virtual void Tick(float DeltaTime) override;
 
     UPROPERTY(EditAnywhere, Category = "Movement")
-    float BulletSpeed = 1000;
+    float BulletSpeed = 4000;
 
     UPROPERTY(VisibleDefaultsOnly, Category = "Projectile")
     USphereComponent* CollisionComponent;

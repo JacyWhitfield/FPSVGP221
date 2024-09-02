@@ -1,48 +1,40 @@
 #include "Player/FPSCharacter.h"
+#include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "Components/InputComponent.h"
+#include "Camera/CameraComponent.h"
+#include "GameFramework/Controller.h"
 #include "Engine/World.h"
-#include "TimerManager.h"
+#include "FPSProjectile.h"
 
-// Sets default values
 AFPSCharacter::AFPSCharacter()
 {
-    // Set this character to call Tick() every frame.
     PrimaryActorTick.bCanEverTick = true;
 
-    // Create a CameraComponent
     FPSCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
     FPSCameraComponent->SetupAttachment(CastChecked<USceneComponent, UCapsuleComponent>(GetCapsuleComponent()));
     FPSCameraComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 50.0f + BaseEyeHeight));
     FPSCameraComponent->bUsePawnControlRotation = true;
 
-    // Create a mesh component for the first-person view (arms)
     FPSMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("FirstPersonMesh"));
     FPSMesh->SetupAttachment(FPSCameraComponent);
     FPSMesh->bCastDynamicShadow = false;
     FPSMesh->CastShadow = false;
-
-    // Only the owning player sees this mesh
     GetMesh()->SetOwnerNoSee(true);
 
-    // Initialize health and ammo
     Health = 100.0f;
-    Ammo = 30;
+    Ammo = 10;
 }
 
-// Called when the game starts or when spawned
 void AFPSCharacter::BeginPlay()
 {
     Super::BeginPlay();
 }
 
-// Called every frame
 void AFPSCharacter::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
 }
 
-// Called to bind functionality to input
 void AFPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
     Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -92,7 +84,11 @@ void AFPSCharacter::EndJump()
 
 void AFPSCharacter::Fire()
 {
-    if (!ProjectileClass || Ammo <= 0) return;
+    if (Ammo <= 0) return; // No ammo to fire
+
+    if (!ProjectileClass) return;
+
+    Ammo--; // Reduce ammo count by 1
 
     FVector CameraLocation;
     FRotator CameraRotation;
@@ -102,19 +98,17 @@ void AFPSCharacter::Fire()
     FRotator MuzzleRotation = CameraRotation;
 
     UWorld* World = GetWorld();
-    if (World)
-    {
-        FActorSpawnParameters SpawnParams;
-        SpawnParams.Owner = this;
-        SpawnParams.Instigator = GetInstigator();
+    if (!World) return;
 
-        AFPSProjectile* Projectile = World->SpawnActor<AFPSProjectile>(ProjectileClass, MuzzleLocation, MuzzleRotation, SpawnParams);
-        if (Projectile)
-        {
-            FVector LaunchDirection = MuzzleRotation.Vector();
-            Projectile->FireInDirection(LaunchDirection);
-            Ammo--; // Decrease ammo count
-        }
+    FActorSpawnParameters SpawnParams;
+    SpawnParams.Owner = this;
+    SpawnParams.Instigator = GetInstigator();
+
+    AFPSProjectile* Projectile = World->SpawnActor<AFPSProjectile>(ProjectileClass, MuzzleLocation, MuzzleRotation, SpawnParams);
+    if (Projectile)
+    {
+        FVector LaunchDirection = MuzzleRotation.Vector();
+        Projectile->FireInDirection(LaunchDirection);
     }
 }
 
@@ -131,23 +125,29 @@ int32 AFPSCharacter::GetAmmo() const
 void AFPSCharacter::AddHealth(float HealthAmount)
 {
     Health += HealthAmount;
-    Health = FMath::Clamp(Health, 0.0f, 100.0f);
-}
+    Health = FMath::Clamp(Health, 0.0f, 100.0f);  // Clamps health between 0 and 100
 
+    if (Health <= 0.0f)
+    {
+        Destroy();
+    }
+}
+// Clamp the add ammo to 32
 void AFPSCharacter::AddAmmo(int32 AmmoAmount)
 {
-    Ammo += AmmoAmount;
+    Ammo = FMath::Clamp(Ammo + AmmoAmount, 0, 32);
 }
+
 
 void AFPSCharacter::ApplySlow(float InSlowAmount, float SlowDuration)
 {
     SlowAmount = InSlowAmount;
-    GetCharacterMovement()->MaxWalkSpeed *= (1.0f - SlowAmount);
+    GetCharacterMovement()->MaxWalkSpeed *= SlowAmount;
 
-    GetWorldTimerManager().SetTimer(UnusedHandle, this, &AFPSCharacter::EndSlow, SlowDuration);
+    GetWorldTimerManager().SetTimer(UnusedHandle, this, &AFPSCharacter::EndSlow, SlowDuration, false);
 }
 
 void AFPSCharacter::EndSlow()
 {
-    GetCharacterMovement()->MaxWalkSpeed /= (1.0f - SlowAmount);
+    GetCharacterMovement()->MaxWalkSpeed /= SlowAmount;
 }

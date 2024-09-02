@@ -27,6 +27,8 @@ public:
     UFUNCTION()
     void OnTargetDetected(AActor* Actor, FAIStimulus Stimulus);
 
+    void AddHealth(float HealthAmount);
+
 private:
     FTimerHandle ShootingTimer;
 
