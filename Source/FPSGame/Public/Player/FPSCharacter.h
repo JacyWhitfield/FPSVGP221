@@ -34,6 +34,7 @@ public:
     void AddAmmo(int32 AmmoAmount);
     void ApplySlow(float SlowAmount, float SlowDuration);
     void EndSlow();
+    void RestoreOriginalSpeed();
 
 private:
     UPROPERTY(EditAnywhere)
@@ -54,6 +55,8 @@ private:
     UPROPERTY(EditAnywhere, Category = "Combat")
     FVector MuzzleOffset;
 
-    float SlowAmount;
+    float SlowAmount = 0.0f;
+    float OriginalSpeed = 600.0f;  // Default walk speed
+
     FTimerHandle UnusedHandle;
 };

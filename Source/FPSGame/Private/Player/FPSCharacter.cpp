@@ -138,16 +138,47 @@ void AFPSCharacter::AddAmmo(int32 AmmoAmount)
     Ammo = FMath::Clamp(Ammo + AmmoAmount, 0, 32);
 }
 
-
 void AFPSCharacter::ApplySlow(float InSlowAmount, float SlowDuration)
 {
+    // Store the original speed only once when entering the slow zone
+    if (SlowAmount == 0.0f)
+    {
+        OriginalSpeed = GetCharacterMovement()->MaxWalkSpeed;
+    }
+
     SlowAmount = InSlowAmount;
-    GetCharacterMovement()->MaxWalkSpeed *= SlowAmount;
+    GetCharacterMovement()->MaxWalkSpeed = OriginalSpeed * SlowAmount;  // Apply the slow effect
+
+    // Log to check the speed when the slow effect is applied
+    UE_LOG(LogTemp, Warning, TEXT("ApplySlow - Original Speed: %f, Current Speed: %f"), OriginalSpeed, GetCharacterMovement()->MaxWalkSpeed);
 
     GetWorldTimerManager().SetTimer(UnusedHandle, this, &AFPSCharacter::EndSlow, SlowDuration, false);
 }
 
 void AFPSCharacter::EndSlow()
 {
-    GetCharacterMovement()->MaxWalkSpeed /= SlowAmount;
+    // Set speed to 300 when leaving the slow zone
+    GetCharacterMovement()->MaxWalkSpeed = 300.0f;
+
+    // Log to check the speed right after leaving the slow zone
+    UE_LOG(LogTemp, Warning, TEXT("EndSlow - Speed set to 300 cm/s for 2 seconds"));
+
+    // Restore the original speed after 2 seconds
+    GetWorldTimerManager().SetTimer(UnusedHandle, this, &AFPSCharacter::RestoreOriginalSpeed, 2.0f, false);
 }
+
+void AFPSCharacter::RestoreOriginalSpeed()
+{
+    GetCharacterMovement()->MaxWalkSpeed = OriginalSpeed;  // Restore the original speed
+
+    // Log to check the speed when restoring the original speed
+    UE_LOG(LogTemp, Warning, TEXT("RestoreOriginalSpeed - Speed restored to: %f"), OriginalSpeed);
+
+    SlowAmount = 0.0f;  // Reset SlowAmount to 0, indicating no slow effect is active
+}
+
+
+
+
+
+
