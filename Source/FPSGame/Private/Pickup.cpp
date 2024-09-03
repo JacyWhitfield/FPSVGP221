@@ -21,7 +21,7 @@ void APickup::NotifyActorBeginOverlap(AActor* OtherActor)
     AFPSCharacter* PlayerCharacter = Cast<AFPSCharacter>(OtherActor);
     if (PlayerCharacter)
     {
-        // Logic for what happens when the player overlaps with the pickup
-        Destroy(); // Destroy the pickup after collection
+       
+        Destroy(); 
     }
 }

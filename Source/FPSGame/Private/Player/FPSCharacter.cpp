@@ -1,4 +1,7 @@
 #include "Player/FPSCharacter.h"
+#include "HUD/FPSHUD.h"
+#include "Enemies/EnemyCharacter.h" 
+#include "Kismet/GameplayStatics.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Camera/CameraComponent.h"
@@ -33,7 +36,30 @@ void AFPSCharacter::BeginPlay()
 void AFPSCharacter::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
+
+    if (Health <= 0.0f)
+    {
+        AFPSHUD* HUD = Cast<AFPSHUD>(UGameplayStatics::GetPlayerController(this, 0)->GetHUD());
+        if (HUD)
+        {
+            HUD->ShowGameOverScreen(false);
+        }
+        return;
+    }
+
+    // Check if all enemies are dead
+    TArray<AActor*> FoundEnemies;
+    UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemyCharacter::StaticClass(), FoundEnemies);
+    if (FoundEnemies.Num() == 0)
+    {
+        AFPSHUD* HUD = Cast<AFPSHUD>(UGameplayStatics::GetPlayerController(this, 0)->GetHUD());
+        if (HUD)
+        {
+            HUD->ShowGameOverScreen(true);
+        }
+    }
 }
+
 
 void AFPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -132,6 +158,7 @@ void AFPSCharacter::AddHealth(float HealthAmount)
         Destroy();
     }
 }
+
 // Clamp the add ammo to 32
 void AFPSCharacter::AddAmmo(int32 AmmoAmount)
 {
@@ -140,45 +167,30 @@ void AFPSCharacter::AddAmmo(int32 AmmoAmount)
 
 void AFPSCharacter::ApplySlow(float InSlowAmount, float SlowDuration)
 {
-    // Store the original speed only once when entering the slow zone
+   
     if (SlowAmount == 0.0f)
     {
         OriginalSpeed = GetCharacterMovement()->MaxWalkSpeed;
     }
 
     SlowAmount = InSlowAmount;
-    GetCharacterMovement()->MaxWalkSpeed = OriginalSpeed * SlowAmount;  // Apply the slow effect
+    GetCharacterMovement()->MaxWalkSpeed = OriginalSpeed * SlowAmount;  
 
-    // Log to check the speed when the slow effect is applied
-    UE_LOG(LogTemp, Warning, TEXT("ApplySlow - Original Speed: %f, Current Speed: %f"), OriginalSpeed, GetCharacterMovement()->MaxWalkSpeed);
-
+    
     GetWorldTimerManager().SetTimer(UnusedHandle, this, &AFPSCharacter::EndSlow, SlowDuration, false);
 }
 
 void AFPSCharacter::EndSlow()
 {
-    // Set speed to 300 when leaving the slow zone
+   
     GetCharacterMovement()->MaxWalkSpeed = 300.0f;
 
-    // Log to check the speed right after leaving the slow zone
-    UE_LOG(LogTemp, Warning, TEXT("EndSlow - Speed set to 300 cm/s for 2 seconds"));
-
-    // Restore the original speed after 2 seconds
     GetWorldTimerManager().SetTimer(UnusedHandle, this, &AFPSCharacter::RestoreOriginalSpeed, 2.0f, false);
 }
 
 void AFPSCharacter::RestoreOriginalSpeed()
 {
-    GetCharacterMovement()->MaxWalkSpeed = OriginalSpeed;  // Restore the original speed
+    GetCharacterMovement()->MaxWalkSpeed = OriginalSpeed;  
 
-    // Log to check the speed when restoring the original speed
-    UE_LOG(LogTemp, Warning, TEXT("RestoreOriginalSpeed - Speed restored to: %f"), OriginalSpeed);
-
-    SlowAmount = 0.0f;  // Reset SlowAmount to 0, indicating no slow effect is active
+    SlowAmount = 0.0f;  
 }
-
-
-
-
-
-

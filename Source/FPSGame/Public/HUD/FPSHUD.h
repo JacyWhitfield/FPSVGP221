@@ -13,10 +13,20 @@ class FPSGAME_API AFPSHUD : public AHUD
 public:
     virtual void DrawHUD() override;
 
+    void ShowGameOverScreen(bool bIsWinner);
+    void ResetGame();
+    void ShowStartButton();
+
 protected:
     UPROPERTY(EditAnywhere, Category = "HUD")
     UTexture2D* CrosshairTexture;
 
     UPROPERTY(EditAnywhere, Category = "HUD")
-    UFont* HUDFont; // Added HUDFont declaration
+    UFont* HUDFont;
+
+    virtual void BeginPlay() override;
+
+private:
+    bool bIsGameOver;
+    bool bIsPlayerWinner;
 };

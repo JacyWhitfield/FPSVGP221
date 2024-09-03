@@ -13,7 +13,7 @@ public class FPSGame : ModuleRules
             "Engine",
             "InputCore",
             "EnhancedInput",
-            "AIModule", // <-- This is crucial for AI-related classes
+            "AIModule", 
             "GameplayTasks",
             "NavigationSystem"
         });

@@ -11,21 +11,21 @@ AHealthPickup::AHealthPickup()
     StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
     RootComponent = StaticMeshComponent;
 
-    // Use a basic shape cube for the health pickup
+   
     static ConstructorHelpers::FObjectFinder<UStaticMesh> CubeMesh(TEXT("/Engine/BasicShapes/Cube.Cube"));
     if (CubeMesh.Succeeded())
     {
         StaticMeshComponent->SetStaticMesh(CubeMesh.Object);
     }
 
-    // Use a basic material for visibility
+    
     static ConstructorHelpers::FObjectFinder<UMaterial> DefaultMaterial(TEXT("/Engine/BasicShapes/BasicShapeMaterial.BasicShapeMaterial"));
     if (DefaultMaterial.Succeeded())
     {
         StaticMeshComponent->SetMaterial(0, DefaultMaterial.Object);
     }
 
-    // Set up collision settings to generate overlap events
+ 
     StaticMeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
     StaticMeshComponent->SetGenerateOverlapEvents(true);
     StaticMeshComponent->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);

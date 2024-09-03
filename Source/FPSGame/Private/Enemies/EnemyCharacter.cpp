@@ -16,7 +16,7 @@ AEnemyCharacter::AEnemyCharacter()
 
     Health = 100.0f;
 
-    // Initialize perception components
+    
     AIPerceptionComponent = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerceptionComponent"));
     SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("SightConfig"));
 
@@ -46,9 +46,9 @@ void AEnemyCharacter::Tick(float DeltaTime)
     ACharacter* PlayerCharacter = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
     if (PlayerCharacter)
     {
-        // Calculate the direction to the player
+    
         FVector DirectionToPlayer = PlayerCharacter->GetActorLocation() - GetActorLocation();
-        DirectionToPlayer.Z = 0.0f; // Keep rotation flat on the ground plane
+        DirectionToPlayer.Z = 0.0f;
 
         FRotator NewRotation = FRotationMatrix::MakeFromX(DirectionToPlayer).Rotator();
         SetActorRotation(NewRotation);
@@ -95,7 +95,7 @@ void AEnemyCharacter::OnTargetDetected(AActor* Actor, FAIStimulus Stimulus)
 {
     if (Stimulus.WasSuccessfullySensed())
     {
-        UE_LOG(LogTemp, Warning, TEXT("Player detected by enemy!"));
+        
         Shoot();
     }
 }

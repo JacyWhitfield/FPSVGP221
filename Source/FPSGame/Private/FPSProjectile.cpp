@@ -22,8 +22,8 @@ AFPSProjectile::AFPSProjectile()
         ProjectileMeshComponent->SetStaticMesh(SphereMesh.Object);
     }
 
-    // Set the size of the projectile mesh here
-    ProjectileMeshComponent->SetRelativeScale3D(FVector(0.05f, 0.05f, 0.05f)); // Smaller size
+    
+    ProjectileMeshComponent->SetRelativeScale3D(FVector(0.05f, 0.05f, 0.05f)); 
 
     static ConstructorHelpers::FObjectFinder<UMaterial> SphereMaterial(TEXT("/Game/Materials/M_Projectile.M_Projectile"));
     if (SphereMaterial.Succeeded()) {

@@ -56,7 +56,7 @@ private:
     FVector MuzzleOffset;
 
     float SlowAmount = 0.0f;
-    float OriginalSpeed = 600.0f;  // Default walk speed
+    float OriginalSpeed = 600.0f;  
 
     FTimerHandle UnusedHandle;
 };
